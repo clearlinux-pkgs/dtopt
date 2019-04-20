@@ -4,7 +4,7 @@
 #
 Name     : dtopt
 Version  : 0.1
-Release  : 2
+Release  : 3
 URL      : https://files.pythonhosted.org/packages/ba/2c/e012086b9f515110a31bbd3e78a509e2b968e0f6808d219c178c5ae697f7/dtopt-0.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/ba/2c/e012086b9f515110a31bbd3e78a509e2b968e0f6808d219c178c5ae697f7/dtopt-0.1.tar.gz
 Summary  : Add options to doctest examples while they are running
