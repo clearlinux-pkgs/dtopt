@@ -4,23 +4,46 @@
 #
 Name     : dtopt
 Version  : 0.1
-Release  : 6
+Release  : 7
 URL      : https://files.pythonhosted.org/packages/ba/2c/e012086b9f515110a31bbd3e78a509e2b968e0f6808d219c178c5ae697f7/dtopt-0.1.tar.gz
 Source0  : https://files.pythonhosted.org/packages/ba/2c/e012086b9f515110a31bbd3e78a509e2b968e0f6808d219c178c5ae697f7/dtopt-0.1.tar.gz
 Summary  : Add options to doctest examples while they are running
 Group    : Development/Tools
 License  : MIT
-Requires: dtopt-python3
-Requires: dtopt-python
+Requires: dtopt-license = %{version}-%{release}
+Requires: dtopt-python = %{version}-%{release}
+Requires: dtopt-python3 = %{version}-%{release}
 BuildRequires : buildreq-distutils3
 
 %description
 When using the `doctest
+<http://python.org/doc/current/lib/module-doctest.html>`_ module it is often
+convenient to use the ELLIPSIS option, which allows you to use ``...`` as a
+wildcard.  But you either have to setup the test runner to use this option, or
+you must put ``#doctest: +ELLIPSIS`` on *every* example that uses this feature.
+
+``dtopt`` lets you enable this option globally from within a doctest, by doing::
+
+    >>> from dtopt import ELLIPSIS
+
+(The options ``NORMALIZE_WHITESPACE`` and ``COMPARE`` are also available)
+
+You can install this from `the subversion repository
+<http://svn.colorstudy.com/dtopt/trunk/#egg=dtopt-dev>`_ with ``easy_install
+dtopt==dev``.
+
+%package license
+Summary: license components for the dtopt package.
+Group: Default
+
+%description license
+license components for the dtopt package.
+
 
 %package python
 Summary: python components for the dtopt package.
 Group: Default
-Requires: dtopt-python3
+Requires: dtopt-python3 = %{version}-%{release}
 
 %description python
 python components for the dtopt package.
@@ -30,6 +53,7 @@ python components for the dtopt package.
 Summary: python3 components for the dtopt package.
 Group: Default
 Requires: python3-core
+Provides: pypi(dtopt)
 
 %description python3
 python3 components for the dtopt package.
@@ -37,24 +61,39 @@ python3 components for the dtopt package.
 
 %prep
 %setup -q -n dtopt-0.1
+cd %{_builddir}/dtopt-0.1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
-export LANG=C
-export SOURCE_DATE_EPOCH=1536442362
-python3 setup.py build -b py3
+export LANG=C.UTF-8
+export SOURCE_DATE_EPOCH=1582920995
+# -Werror is for werrorists
+export GCC_IGNORE_WERROR=1
+export CFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$CFLAGS -fno-lto "
+export FFLAGS="$CFLAGS -fno-lto "
+export CXXFLAGS="$CXXFLAGS -fno-lto "
+export MAKEFLAGS=%{?_smp_mflags}
+python3 setup.py build
 
 %install
+export MAKEFLAGS=%{?_smp_mflags}
 rm -rf %{buildroot}
-python3 -tt setup.py build -b py3 install --root=%{buildroot}
+mkdir -p %{buildroot}/usr/share/package-licenses/dtopt
+cp %{_builddir}/dtopt-0.1/docs/license.txt %{buildroot}/usr/share/package-licenses/dtopt/ba613970a44c98c7d93a10ffa13c777259c961a8
+python3 -tt setup.py build  install --root=%{buildroot}
 echo ----[ mark ]----
 cat %{buildroot}/usr/lib/python3*/site-packages/*/requires.txt || :
 echo ----[ mark ]----
 
 %files
 %defattr(-,root,root,-)
+
+%files license
+%defattr(0644,root,root,0755)
+/usr/share/package-licenses/dtopt/ba613970a44c98c7d93a10ffa13c777259c961a8
 
 %files python
 %defattr(-,root,root,-)
